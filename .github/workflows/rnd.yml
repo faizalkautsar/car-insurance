@@ -1,0 +1,47 @@
+name: rnd-build-cache
+on:
+  pull_request:
+    branches:
+      - "main/**"
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    # Map a step output to a job output
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.7.0
+
+      - run: npm install --legacy-peer-deps
+
+      - run: npm run test
+
+
+  build:
+    runs-on: ubuntu-latest
+    needs: main
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.7.0
+
+      - run: npm install --legacy-peer-deps
+
+      - name: Build app
+        run: npm run build
